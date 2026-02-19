@@ -1,11 +1,17 @@
 import { EdamamResponse, SearchFilters } from '../types';
 
-const APP_ID = '0ac9fe5c';
-const APP_KEY = '6c0b154d0993874aa2d0de8e22a1a45f';
-const APP_USER = '1409622401946';
+// Fallback to hardcoded keys if process.env is unavailable in this runtime environment
+const APP_ID = (typeof process !== 'undefined' && process.env && process.env.EDAMAM_APP_ID) || '0ac9fe5c';
+const APP_KEY = (typeof process !== 'undefined' && process.env && process.env.EDAMAM_APP_KEY) || '6c0b154d0993874aa2d0de8e22a1a45f';
+const APP_USER = (typeof process !== 'undefined' && process.env && process.env.EDAMAM_APP_USER) || '1409622401946';
 const BASE_URL = 'https://api.edamam.com/api/recipes/v2';
 
 export const fetchRecipes = async (filters: SearchFilters): Promise<EdamamResponse> => {
+  if (!APP_ID || !APP_KEY) {
+    console.error("Missing API Keys: Please verify your keys are configured.");
+    throw new Error("Configuration Error: API keys not found.");
+  }
+
   const url = new URL(BASE_URL);
   url.searchParams.append('type', 'public');
   url.searchParams.append('app_id', APP_ID);
@@ -24,14 +30,23 @@ export const fetchRecipes = async (filters: SearchFilters): Promise<EdamamRespon
   }
 
   try {
-    const response = await fetch(url.toString(), {
-      headers: {
-        'Edamam-Account-User': APP_USER
-      }
-    });
+    const headers: HeadersInit = {
+        'Accept': 'application/json'
+    };
+
+    // Only attach user header if the var is present
+    if (APP_USER) {
+        headers['Edamam-Account-User'] = APP_USER;
+    }
+
+    const response = await fetch(url.toString(), { headers });
 
     if (!response.ok) {
       const errorText = await response.text();
+      // Handle specific 429 errors or auth errors gracefully
+      if (response.status === 401 || response.status === 403) {
+          throw new Error("API Authentication failed. Please check your credentials.");
+      }
       throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
     }
     const data = await response.json();
