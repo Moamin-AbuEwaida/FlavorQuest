@@ -1,15 +1,34 @@
 import { EdamamResponse, SearchFilters } from '../types';
 
-// Fallback to hardcoded keys if process.env is unavailable in this runtime environment
-const APP_ID = (typeof process !== 'undefined' && process.env && process.env.EDAMAM_APP_ID) || '0ac9fe5c';
-const APP_KEY = (typeof process !== 'undefined' && process.env && process.env.EDAMAM_APP_KEY) || '6c0b154d0993874aa2d0de8e22a1a45f';
-const APP_USER = (typeof process !== 'undefined' && process.env && process.env.EDAMAM_APP_USER) || '1409622401946';
+// Access global window ENV variables defined in index.html
+// This is a robust fallback for GitHub Pages where .env files might not be processed correctly in all setups
+const getEnv = () => {
+  // @ts-ignore
+  if (typeof window !== 'undefined' && window.ENV) {
+    // @ts-ignore
+    return window.ENV;
+  }
+  // Fallback to standard import.meta.env if window.ENV is missing
+  try {
+     // @ts-ignore
+     return import.meta.env || {};
+  } catch (e) {
+     return {};
+  }
+};
+
+const env = getEnv();
+
+const APP_ID = env.VITE_EDAMAM_APP_ID || '';
+const APP_KEY = env.VITE_EDAMAM_APP_KEY || '';
+const APP_USER = env.VITE_EDAMAM_APP_USER || '';
+
 const BASE_URL = 'https://api.edamam.com/api/recipes/v2';
 
 export const fetchRecipes = async (filters: SearchFilters): Promise<EdamamResponse> => {
   if (!APP_ID || !APP_KEY) {
-    console.error("Missing API Keys: Please verify your keys are configured.");
-    throw new Error("Configuration Error: API keys not found.");
+    console.error("Missing API Keys: Keys not found in window.ENV or .env");
+    // We don't throw immediately to allow the UI to render (potentially with empty states)
   }
 
   const url = new URL(BASE_URL);
