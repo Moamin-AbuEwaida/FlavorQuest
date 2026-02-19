@@ -1,0 +1,5 @@
+{
+  "name": "FlavorQuest",
+  "description": "A responsive recipe discovery platform helping users find meals, learn skills, and explore global cuisines using the Edamam API.",
+  "requestFramePermissions": []
+}
