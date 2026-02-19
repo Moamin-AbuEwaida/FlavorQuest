@@ -1,7 +1,8 @@
 /* @tailwind directives removed to support CDN mode */
+@source "../node_modules/@acmecorp/ui-lib";
 
 body {
-  background-color: #FAFAFA;
+  background-color: #fafafa;
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -21,13 +22,27 @@ body {
   animation: marquee 20s linear infinite;
 }
 @keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 /* Staggered Delay Utility */
-.delay-100 { animation-delay: 100ms; }
-.delay-200 { animation-delay: 200ms; }
-.delay-300 { animation-delay: 300ms; }
-.delay-400 { animation-delay: 400ms; }
-.delay-500 { animation-delay: 500ms; }
+.delay-100 {
+  animation-delay: 100ms;
+}
+.delay-200 {
+  animation-delay: 200ms;
+}
+.delay-300 {
+  animation-delay: 300ms;
+}
+.delay-400 {
+  animation-delay: 400ms;
+}
+.delay-500 {
+  animation-delay: 500ms;
+}
